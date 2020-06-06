@@ -17,8 +17,8 @@
         </b-row>
         <b-row v-if="currentSeminar.isFull">
           <span class="full_text col">
-            Seminar is currently full.
-            <br>Please register for the next upcoming seminar
+             Event is currently full.
+            <br>Please register for the next upcoming Event
             <br>or email the administrator at eg@amityhealthcaregroup.com or call at 303-690-2749 to be waitlisted for the event
           </span>
         </b-row>
@@ -28,13 +28,13 @@
                   label-cols-sm="6"
                   label-cols-lg="6"
                   label-cols-md="6"
-                  label="Seminar Description:"
+                  label="Description:"
                   ></b-form-group></b>
             </b-col>
         </b-row>
           <b-row>
           <b-col>
-            <read-more more-str="read more" :text="currentSeminar.description" link="#" less-str="read less" :max-chars="250"></read-more>
+            <read-more more-str="read more" :text="currentSeminar.formated_description" link="#" less-str="read less" :max-chars="250000"></read-more>
             <!-- <b-form-textarea v-model="currentSeminar.description" disabled rows="8" max-rows="8"></b-form-textarea> -->
           </b-col>
         </b-row>
@@ -61,10 +61,10 @@
             </b-form-group> 
           </b-col>-->
         </b-row>
-        <b-row v-if="!currentSeminar.isFull" class="mt-2">
+        <b-row  v-if="!currentSeminar.isFull && isSeminar" class="mt-2">
           <b-col>
                 <b-row  style="margin-bottom:-20px;">
-                  <b-col>
+                  <b-col> 
                         <b><b-form-group
                           label-cols-sm="10"
                           label-cols-lg="10"
@@ -75,7 +75,7 @@
                 </b-row>
                 <b-row >
                   <b-col>
-                    <read-more more-str="read more" :text="currentSeminar.venue_address" link="#" less-str="read less" :max-chars="250">&nbsp;</read-more>
+                    <read-more more-str="read more" :text="currentSeminar.venue_address" link="#" less-str="read less" :max-chars="250000">&nbsp;</read-more>
                       <br/>
                   </b-col>
                 </b-row>
@@ -112,6 +112,24 @@
             
           </b-col>
         </b-row>
+        
+        <b-row  v-if="!currentSeminar.isFull && !isSeminar" class="mt-2">
+            <b-col md="3" sm="2">
+              <label for="textarea-default" style="font-weight:bold;">Webinar Details:</label>
+            </b-col>
+            <b-col md="9" sm="12">
+              <read-more more-str="read more" :text="currentSeminar.webinarDetails" link="#" less-str="read less" :max-chars="250000">&nbsp;</read-more>
+              <!-- <b-form-textarea disabled rows="3" v-model="currentSeminar.venue_address"></b-form-textarea> -->
+            </b-col>
+            <b-col sm="3">
+              <label for="textarea-default" style="font-weight:bold;">Call To Action (Zoom Link):</label>
+            </b-col>
+            <b-col md="9" sm="12">
+              <a :href="currentSeminar.url">Click Here To Join</a>
+              <!-- <b-form-textarea disabled rows="3" v-model="currentSeminar.venue_address"></b-form-textarea> -->
+            </b-col>
+        </b-row>
+
          <b-row>
         <b-col class="mt-3">
             <b-row>
@@ -286,6 +304,34 @@
                       <b-form-radio value="Email & Text">Email & Text</b-form-radio>
                     </b-form-radio-group>
                   </b-form-group>
+
+                  <b-form-group
+                    v-if="isSeminar"
+                    label-cols-sm="4"
+                    label-cols-lg="3"
+                    id="input-group-2"
+                    label="Additional Accommodation Request"
+                    label-for="input-2"
+                    :invalid-feedback="l_error[`registrants.${index}.companyName`] ? l_error[`registrants.${index}.companyName`][0] : '' "
+                  >
+
+                  <b-form-textarea
+                        id="textarea"
+                        v-model="item.accommodation"
+                        rows="3"
+                        max-rows="6"
+                      ></b-form-textarea>
+
+<!-- 
+                    <b-form-input
+                      :disabled="String(item.applicable) === 'Not Applicable' ? true :false"
+                      :state="l_error[`registrants.${index}.companyName`] ? false : true"
+                      v-model="item.companyName"
+                      required
+                      placeholder="Enter company name"
+                    ></b-form-input> -->
+                  </b-form-group>
+
                 </b-card-body>
               </b-collapse>
             </b-card>
@@ -331,6 +377,7 @@
                   <b-row class="mt-2" style="width:100%" sm="12" md="12" lg="12">
                     <b-col sm="6"><b>Total Fee:</b></b-col>
                     <b-col>
+                      
                       <span
                         class="form-control totalfees"
                       >${{ formatMoney(parseFloat(currentSeminar.cost_per_seat || 0) * parseFloat(registrants.length || 0))}}</span>
@@ -340,7 +387,9 @@
                 </b-row>
            
                 <b-row v-if="!currentSeminar.isFull && !currentSeminar.isPast" class="mt-2 pr-3 pl-3">
+                  <b-col v-if="currentSeminar.isPaid" block="" sm="12" md="12" lg="12" >
                   <!-- <b-button block="" :disabled="!registrantsError" variant="success" v-b-modal.modal-center>PROCEED TO PAYMENT</b-button> -->
+                  <!-- <button @click='processPayment'>Pay Here</button> -->
                   <PayPal
                     :button-style="myStyle"
                   
@@ -350,22 +399,53 @@
                     currency="USD"
                     :experience="{
                         input_fields: {
-                  no_shipping: 1
-                }
+                          no_shipping: 1
+                        }
                       }"
                     :client="paypal"
                     env="production"
                   ></PayPal>
+        
                 <!-- <span v-if="!currentSeminar.isPast"> -->
                   <button v-if="!registrantsError || currentSeminar.isFull" disabled class="dummybutton">Buy Now</button>
                   <br/>
                     <div style="font-size:12px;text-align:center;font-weight:bold;"><i>if you're paying with Debit/Credit card, please scroll down in the PayPal popup window to see this option</i></div>
                 <!-- </span>  -->
+                  </b-col>
+                    <b-col v-else block="" sm="12" md="12" lg="12" >
+              <!-- <button @click='processPayment'>Pay Here</button> -->
+                <!-- <PayPal 
+                  :button-style="myStyle"
+                  v-if="registrantsError"
+                  
+                  @payment-completed="processPayment"
+                  :amount="`${(parseFloat(currentSeminar.cost_per_seat || 0) * parseFloat(registrants.length || 0)).toFixed(2)}`"
+                  currency="USD"
+                  :experience="{
+                      input_fields: {
+                no_shipping: 1
+              }
+                    }"
+                  :client="paypal"
+                  env="sandbox"
+                ></PayPal> -->
+      
+                <button v-if="registrantsError" class="activebutton" @click="SaveBooking('FREE'+Math.floor((Math.random() * 800000) + 1), 
+                  'Test',
+                  'free',
+                  Math.floor((Math.random() * 800000) + 1))">Register</button><br/>
+                
+                <span v-if="!currentSeminar.isPast">
+                    <button v-if="!registrantsError || currentSeminar.isFull" disabled class="dummybutton">Register</button><br/>
+                    <!--div style="font-size:12px;text-align:center;font-weight:bold;"><i>if you're paying with Debit/Credit card, please scroll down in the PayPal popup window to see this option</i></div-->
+                  </span>   
+              
+            </b-col>
               </b-row>
             </div>
       </b-col>
     </b-row>
-     <b-modal id="modal-center" centered hide-footer hide-header>
+     <!-- <b-modal id="modal-center" centered hide-footer hide-header>
       <div class="modelDiv">
         <span style="font-weight: 800;">Disclaimer</span>
 
@@ -384,8 +464,8 @@
           currency="USD"
           :experience="{
                 input_fields: {
-          no_shipping: 1
-        }
+                no_shipping: 1
+                }
               }"
           :client="paypal"
           env="sandbox"
@@ -393,7 +473,7 @@
         <b-button pill @click="$bvModal.hide('modal-center')" style="width: 200px;
     height: 38px;">Cancel</b-button>
       </div>
-    </b-modal>
+    </b-modal> -->
     <Loadder v-if="isProcess"/>
   </b-container>
 </template>
@@ -431,24 +511,22 @@ export default {
       loading: false,
       events: [],
       isProcess: false,
-      // paypal: {
-      //   sandbox:
-      //     "AT1L2reKiixvOpfviW4EasOTaQXKhigqLpIIbBeHQfUWPYi_XWoWat8ppdsYZMwdmHsCj1dx6NnG36YN",
-      //   production: "<production client id>"
-      // },
       paypal: {
-        sandbox:
-          "",
-        production: "AUFnvE0LVsJKtenY0t3fHlcpKeESQbPxtBIkym7lCqo5oFbm3ewIfaQeXpQ5qqQE3jcEglZNSmLWlpKx"
-       },
+          // sandbox:'AT1L2reKiixvOpfviW4EasOTaQXKhigqLpIIbBeHQfUWPYi_XWoWat8ppdsYZMwdmHsCj1dx6NnG36YN',
+         production:'AUFnvE0LVsJKtenY0t3fHlcpKeESQbPxtBIkym7lCqo5oFbm3ewIfaQeXpQ5qqQE3jcEglZNSmLWlpKx'
+      },
+      
       error: {},
       registrants: [
-{ name: null,
-        phoneNumber: null,
-        email: null,
-        companyName: null,
-        applicable: "Applicable",
-        choice_of_communication: "Email Only"}
+        {
+          name: null,
+          phoneNumber: null,
+          email: null,
+          companyName: null,
+          applicable: "Applicable",
+          choice_of_communication: "Email Only",
+          accommodation:""
+        }
       ],
       currentCroods: {},
       currentSeminar: {
@@ -557,6 +635,13 @@ this.loadData(this.$route.params.id);
             payment.payer.payment_method,
             payment.transactions[0].related_resources[0].sale.id
           );
+
+          //  this.SaveBooking(
+          //   '4EM20986XK5485518',
+          //   'websenor.mukul@gmail.com',
+          //   'paypal',
+          //   '4EM20986XK5485518'
+          // );
         })
         .catch(error => {
           this.isProcess = false;
@@ -565,6 +650,9 @@ this.loadData(this.$route.params.id);
     },
 
     SaveBooking(payment_id, payer_id,payment_method,sale_id) {
+      
+      this.isProcess = true;
+      
       this.$http
         .post("seminar/booking", {
           payment_id,
@@ -595,7 +683,8 @@ this.loadData(this.$route.params.id);
         email: null,
         companyName: null,
         applicable: "Applicable",
-        choice_of_communication: "Email Only"
+        choice_of_communication: "Email Only",
+        accommodation:''
       });
     },
     eventSelected(ev) {
@@ -606,7 +695,7 @@ this.loadData(this.$route.params.id);
         //   return;
         // }
         // this.registrants = [];
-        this.registrants=[{ "name": null, "phoneNumber": null, "email": null, "companyName": null, "applicable": "Applicable", "choice_of_communication": "Email Only" }];
+        this.registrants=[{ "name": null, "phoneNumber": null, "email": null, "companyName": null, "applicable": "Applicable", "choice_of_communication": "Email Only",'accommodation':''}];
         this.error={};
         this.currentSeminar = responce;
         if (responce.lat && String(responce.lat).trim()) {
@@ -724,6 +813,10 @@ this.loadData(this.$route.params.id);
     }
   },
   computed: {
+    isSeminar()
+    {
+      return (this.currentSeminar.type=="seminar")?true:false
+    },
     formatePhoneNumber() {
       return (
         phone.substr(0, 3) + "-" + phone.substr(3, 3) + "-" + phone.substr(6, 4)
@@ -1041,4 +1134,24 @@ pre {
             white-space: -o-pre-wrap;
             word-wrap: break-word;
          }
+         .activebutton
+{
+    font-weight: bold;
+    font-size: 20px;
+    padding:8px;
+    text-align: 'center';
+     background:green; /*#009cde; */
+    border-radius: 30px;
+    color: #fff;
+    border: 1px solid transparent;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    vertical-align: top;
+    cursor: pointer;
+    outline: none;
+    overflow: hidden;
+
+}
 </style>

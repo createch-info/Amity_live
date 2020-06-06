@@ -51,7 +51,7 @@
     <div class="container-fluid">
       <b-row class="wrap-builder-items">
         <div class="col-md-2 fbranddiv">
-          <img src="https://www.amityhealthcaregroup.com/wp-content/uploads/2019/03/amity-logo-1.png" class="footerbrand">
+          <img src="https://amityhealthcaregroup.com/wp-content/uploads/2019/03/amity-logo-1.png" class="footerbrand">
 
         </div>
         <div class="col-md-1"></div>
@@ -78,8 +78,8 @@
       </div>
       <div class="col-md-6">
        <div class="menuright">
-        <a href="https://www.amityhealthcaregroup.com/privacy-policy/" class="footernavi">Privacy Policy</a> 
-        <a href="https://www.amityhealthcaregroup.com/terms-and-conditions/" class="footernavi">Terms and Conditions</a>
+        <a href="https://amityhealthcaregroup.com/privacy-policy/" class="footernavi">Privacy Policy</a> 
+        <a href="https://amityhealthcaregroup.com/terms-and-conditions/" class="footernavi">Terms and Conditions</a>
        </div>
       </div>
       </div>

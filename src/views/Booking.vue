@@ -7,14 +7,26 @@
     <b-row v-if="!isProcess">
         <b-col md="8" sm="12" lg="8" class="calender-root">
         <b-row>
-          <b-col>
-            <b-button to="/" variant="primary">Back To Calendar</b-button>
+          <b-col> 
+            <b-button href="https://amityhealthcaregroup.com/education/index.html" variant="primary">Back To Calendar</b-button>
           </b-col>
         </b-row>
         <b-row>
           <b-col class="label01">
+            Event Type: <label v-text="`${currentSeminar.type || ''}`"></label>
+          </b-col>
+
+        </b-row>
+
+        <b-row>
+    
+          <b-col class="label01">
             <label v-text="`${currentSeminar.title || ''}`"></label>
           </b-col>
+
+        </b-row>
+
+        <b-row>
           <b-col class="label02">
             <label
               v-text="` ${formatedSeminarDate} ${currentSeminar.seminar_date ? currentSeminar.seminar_date.split(' - ').pop():''} - ${currentSeminar.end_time || ''}`"
@@ -24,8 +36,8 @@
 
         <b-row v-if="currentSeminar.isFull && !currentSeminar.isPast">
           <span class="full_text col">
-            Seminar is currently full.
-            <br />Please register for the next upcoming seminar
+            Event is currently full.
+            <br />Please register for the next upcoming Event
             <br />or email the administrator at eg@amityhealthcaregroup.com or call at 303-690-2749 to be waitlisted for the event
           </span>
         </b-row>
@@ -36,7 +48,7 @@
                           label-cols-sm="6"
                           label-cols-lg="6"
                           label-cols-md="6"
-                          label="Seminar Description:"
+                          label="Description:"
                         >  </b-form-group></b>
             </b-col>
         </b-row>
@@ -44,12 +56,12 @@
         <b-row class="mt-2">
           <b-col>
             <!-- <div v-html="currentSeminar.description"></div> -->
-            <read-more more-str="read more" :text="currentSeminar.description" link="#" less-str="read less" :max-chars="250"></read-more>
+            <read-more more-str="read more" :text="currentSeminar.formated_description" link="#" less-str="read less" :max-chars="250000"></read-more>
             <!-- <b-form-textarea v-model="currentSeminar.description" disabled rows="8" max-rows="8"></b-form-textarea> -->
           </b-col>
         </b-row>
         
-        <b-row  class="mt-2">
+        <b-row v-if="isSeminar" class="mt-2">
           <b-col>
             <b-row>
               <b-col> 
@@ -64,7 +76,7 @@
             </b-row>
              <b-row >
                   <b-col>
-                     <read-more more-str="read more" :text="currentSeminar.venue_address" link="#" less-str="read less" :max-chars="250"></read-more>
+                     <read-more more-str="read more" :text="currentSeminar.venue_address" link="#" less-str="read less" :max-chars="250000"></read-more>
                       
                       <!-- <b-form-textarea disabled rows="6" style="background-color:white;border:none;resize: none;outline:none;" v-model="currentSeminar.venue_address"></b-form-textarea> -->
                       <br/>
@@ -104,6 +116,22 @@
         </b-row>
         
         <br/>
+
+<!-- 
+        <b-row v-if="!isSeminar">
+            <b-col md="2" sm="2">
+              <label for="textarea-default" style="font-weight:bold;">Webinar Details:</label>
+            </b-col>
+            <b-col md="10" sm="12">
+              <read-more more-str="read more" :text="currentSeminar.webinarDetails" link="#" less-str="read less" :max-chars="250000"></read-more>
+            </b-col>
+            <b-col sm="2">
+              <label for="textarea-default" style="font-weight:bold;">Call To Action:</label>
+            </b-col>
+            <b-col md="10" sm="12">
+              <a :href="currentSeminar.url">Click Here To Join</a>
+            </b-col>
+        </b-row> -->
 
          <div> <!-- v-if="currentSeminar.isPast"> -->
             <b-row><!-- v-if="currentSeminar.isFull"-->
@@ -176,6 +204,7 @@
                 :loading="loading"
                 :first-day="1"
                 :daysync="day"
+                :monthchanger="true"
                 :current-date="currentSeminar._correct_date"
                 :all-events="events"
                 :showWeekNumberFlag="true"
@@ -313,6 +342,23 @@
                       <b-form-radio value="Email & Text">Email & Text</b-form-radio>
                     </b-form-radio-group>
                   </b-form-group>
+                        <b-form-group
+                        v-if="isSeminar"
+                        label-cols-sm="4"
+                        label-cols-lg="3"
+                        id="input-group-2"
+                        label="Additional Accommodation Request"
+                        label-for="input-2"
+                        :invalid-feedback="l_error[`registrants.${index}.companyName`] ? l_error[`registrants.${index}.companyName`][0] : '' "
+                      >
+
+                      <b-form-textarea
+                        id="textarea"
+                        v-model="item.accommodation"
+                        rows="3"
+                        max-rows="6"
+                      ></b-form-textarea>
+                     </b-form-group>
                 </b-card-body>
               </b-collapse>
             </b-card>
@@ -326,14 +372,14 @@
       </div>    
           
       </b-col>
-      
-     <b-col style="position:relative;margin:0px;top:30px">    
+    
+     <b-col align-self="end">    
        <!-- <b-col>    -->
-         <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-        <div v-if="!currentSeminar.isPast" style="position:absolute;margin:0px;bottom:20px;width:90%;">
+      <br>           
+        <div v-if="!currentSeminar.isPast" class="detailed-panel">
           <b-row v-if="!currentSeminar.isFull" class="mt-2 fee-detail myboxD" style="font-weight:bold;">
             <b-row style="width:100%;" sm="12" md="12" lg="12">
-              <b-col sm="6">Seminar Fee:</b-col>
+              <b-col sm="6">Fee Per Registrant:</b-col>
               <b-col  >
                 <span class="form-control">${{formatMoney(currentSeminar.cost_per_seat)}}</span>
               </b-col>
@@ -357,7 +403,8 @@
           </b-row>
           
           <b-row v-if="!currentSeminar.isFull" class="mt-2 pr-3 pl-3">
-            <b-col block="" sm="12" md="12" lg="12" >
+            <b-col v-if="currentSeminar.isPaid" block="" sm="12" md="12" lg="12" >
+              <!-- <button @click='processPayment'>Pay Here</button> -->
                 <PayPal 
                   :button-style="myStyle"
                   v-if="registrantsError"
@@ -380,6 +427,37 @@
                   </span>   
               
             </b-col>
+
+            <b-col v-else block="" sm="12" md="12" lg="12" >
+              <!-- <button @click='processPayment'>Pay Here</button> -->
+                <!-- <PayPal 
+                  :button-style="myStyle"
+                  v-if="registrantsError"
+                  
+                  @payment-completed="processPayment"
+                  :amount="`${(parseFloat(currentSeminar.cost_per_seat || 0) * parseFloat(registrants.length || 0)).toFixed(2)}`"
+                  currency="USD"
+                  :experience="{
+                      input_fields: {
+                no_shipping: 1
+              }
+                    }"
+                  :client="paypal"
+                  env="sandbox"
+                ></PayPal> -->
+        
+                <button v-if="registrantsError" class="activebutton" @click="SaveBooking('FREE'+Math.floor((Math.random() * 800000) + 1), 
+                  'Test',
+                  'free',
+                  Math.floor((Math.random() * 800000) + 1))">Register</button><br/>
+                
+                <span v-if="!currentSeminar.isPast">
+                    <button v-if="!registrantsError || currentSeminar.isFull" disabled class="dummybutton">Register</button><br/>
+                    <!--div style="font-size:12px;text-align:center;font-weight:bold;"><i>if you're paying with Debit/Credit card, please scroll down in the PayPal popup window to see this option</i></div-->
+                  </span>   
+              
+            </b-col>
+
           </b-row>
         </div>  
       </b-col>
@@ -419,6 +497,7 @@
 </template>
 
 <script>
+import Extra from "./../extra";
 import EventBus from "./../eventBus";
 import Calendar from "@/components/Calendra/Calendar";
 import PayPal from "vue-paypal-checkout";
@@ -446,15 +525,11 @@ export default {
       loading: false,
       events: [],
       isProcess: false,
-      // paypal: {
-      //   sandbox:
-      //     "AT1L2reKiixvOpfviW4EasOTaQXKhigqLpIIbBeHQfUWPYi_XWoWat8ppdsYZMwdmHsCj1dx6NnG36YN",
-      //   production: "<production client id>"
-      // },
+      
       paypal: {
-        sandbox:
-          "",
-        production: "AUFnvE0LVsJKtenY0t3fHlcpKeESQbPxtBIkym7lCqo5oFbm3ewIfaQeXpQ5qqQE3jcEglZNSmLWlpKx"
+        // sandbox:
+        //   "AT1L2reKiixvOpfviW4EasOTaQXKhigqLpIIbBeHQfUWPYi_XWoWat8ppdsYZMwdmHsCj1dx6NnG36YN",
+       production: "AUFnvE0LVsJKtenY0t3fHlcpKeESQbPxtBIkym7lCqo5oFbm3ewIfaQeXpQ5qqQE3jcEglZNSmLWlpKx"
        },
       error: {},
       registrants: [
@@ -464,7 +539,8 @@ export default {
           email: null,
           companyName: null,
           applicable: "Applicable",
-          choice_of_communication: "Email Only"
+          choice_of_communication: "Email Only",
+          accommodation:''
         }
       ],
       currentCroods: {},
@@ -575,6 +651,14 @@ this.$bvModal.hide('modal-center')
             payment.payer.payment_method,
             payment.transactions[0].related_resources[0].sale.id
           );
+
+
+          //  this.SaveBooking(
+          //   '4EM20986XK5485518',
+          //   'websenor.mukul@gmail.com',
+          //   'paypal',
+          //   '4EM20986XK5485518'
+          // );
         })
         .catch(error => {
           this.isProcess = false; 
@@ -583,6 +667,7 @@ this.$bvModal.hide('modal-center')
     },
 
     SaveBooking(payment_id, payer_id,payment_method,sale_id) {
+      this.isProcess = true;
       this.$http
         .post("seminar/booking", {
           payment_id,
@@ -613,7 +698,8 @@ this.$bvModal.hide('modal-center')
         email: null,
         companyName: null,
         applicable: "Applicable",
-        choice_of_communication: "Email Only"
+        choice_of_communication: "Email Only",
+        accommodation:''
       });
     },
     eventSelected(ev) {
@@ -673,7 +759,7 @@ this.$bvModal.hide('modal-center')
         .then(responce => {
           this.events = responce;
           this.day=this.currentSeminar.day; 
-          console.log('here');
+          
           this.loading = false;
         })
         .catch(error => {
@@ -740,18 +826,27 @@ this.$bvModal.hide('modal-center')
     }
   },
   computed: {
+    genratePaymentDetails()
+    {
     
+    },
+      isSeminar()
+    {
+      return (this.currentSeminar.type=="seminar")?true:false
+    },
+     href() {
+      return Extra.isAuthenticated() ? "/#/admin" : "/";
+    },
+  
     formatePhoneNumber() {
       return (
         phone.substr(0, 3) + "-" + phone.substr(3, 3) + "-" + phone.substr(6, 4)
       );
     },
     formatedSeminarDate() {
-      return this.currentSeminar.seminar_date
-        ? moment(this.currentSeminar.seminar_date.split(" - ")[0]).format(
-            "MM/DD/YYYY"
-          )
-        : "";
+      return moment(this.currentSeminar.seminar_date.split(" - ")[0]).format(
+            "LL"
+          );
     },
     registrantsError() {
       let _this = this;
@@ -803,7 +898,7 @@ this.$bvModal.hide('modal-center')
             [`registrants.${r_index}.phoneNumber`]: ["Phone mumber is required"]
           };
         }else {
-          console.log('r_item.phoneNumber',r_item.phoneNumber,r_item.phoneNumber.length < 10)
+          
           if(r_item.phoneNumber.length < 10){
             _this.error = { 
             ..._this.error,
@@ -878,6 +973,19 @@ this.$bvModal.hide('modal-center')
 };
 </script>
 <style  >
+/*.detailed-panel{
+  position:absolute;
+  margin:0px;
+  bottom:20px;
+  width:90%;
+}
+
+@media (max-width: 768px) {
+   .detailed-panel{
+     bottom:-68
+   }
+}*/
+
 .hrDiv {
   height: 2px;
   width: 100%;
@@ -1009,7 +1117,7 @@ button.btn.rotatebtn.btn-primary {
     text-align: left;
     width: 40%!important;
     padding: 15px 5px;
-    font-size: 14px;
+    font-size: 16px;
     float: left;
 }
 .label02 {
@@ -1027,6 +1135,26 @@ button.btn.rotatebtn.btn-primary {
     padding:8px;
     text-align: 'center';
      background:gray; /*#009cde; */
+    border-radius: 30px;
+    color: #fff;
+    border: 1px solid transparent;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    vertical-align: top;
+    cursor: pointer;
+    outline: none;
+    overflow: hidden;
+
+}
+.activebutton
+{
+    font-weight: bold;
+    font-size: 20px;
+    padding:8px;
+    text-align: 'center';
+     background:green; /*#009cde; */
     border-radius: 30px;
     color: #fff;
     border: 1px solid transparent;

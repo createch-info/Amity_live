@@ -1,30 +1,34 @@
 <template>
-    <div class="parent_div_cal">
+    <div style="background-color:#f4f4f4;padding:10px;" class="parent_div_cal">
         <div class="lodder" v-if="loading" >
 			<b-spinner variant="primary" label="Spinning"></b-spinner>
 		</div>
-        <div v-if="error" class="error"></div>
+        <div v-if="error" class="error"></div> 
         <div class="panel panel-default">
         
+		<!-- {{currentDate}} --> 
             <div class="panel-body">
                 <div class="row">
                     <div class="col-sm-12">
                         <calendar-header :current-month="currentMonth"
                                          :first-day="firstDay"
-                                         :locale="appLocale">
-                        </calendar-header>
+                                         :locale="appLocale"
+										 :monthchanger="monthchanger">
+						</calendar-header>
 
                         <div class="full-calendar-body">
                             <div class="weeks">
-                                <strong :key="dayIndex" class="week" v-for="dayIndex in 7">{{ (dayIndex - 1) | weekDayName(firstDay, appLocale) }}</strong>
+                                <strong :key="dayIndex" class="week" v-for="dayIndex in 7">{{ (dayIndex - 1) | weekDayName(firstDay, appLocale)[0] }}</strong>
                             </div> 
 
                             <div class="dates" ref="dates">
-                                <week :issmall="issmall" v-for="(week, index) in Weeks"
-                                      :firstDay="firstDay"
-                                      :key="index"
-									  :dayclicked="daysync"
-                                      :week="week">
+                                <week 
+										:customHeight="customheight"
+										:issmall="issmall" v-for="(week, index) in Weeks"
+										:firstDay="firstDay"
+										:key="index"
+										:dayclicked="daysync"
+										:week="week">
                                 </week>
                             </div>
                         </div>
@@ -50,12 +54,19 @@
 			}
 		},
 		props: {
+			monthchanger:{
+				type:Boolean,
+				default:false
+			},
+			customheight:{
+				   type:String,
+			},
 			daysync:{
 				type:Number,
 				default:0
 			},
 			currentDate:{
-			  type:String,
+			//   type:String,
 			  default:moment().toString()
 			},
 			issmall:{
@@ -125,6 +136,10 @@
 					week = [];
 					for (let dayIndex=0; dayIndex < 7; dayIndex++) {
 
+						// let weekinstance=this.getDayObject(monthMomentObject, dayIndex)
+					
+						// console.log(weekinstance.cardDate);
+						
 						week.push(this.getDayObject(monthMomentObject, dayIndex));
 
 						monthMomentObject.add(1, 'day');
@@ -159,6 +174,7 @@
 		},
 		methods: {
 			getEvents (date) {
+				// console.log("DAYEve:",this.events);
 				return this.events.filter(event => {
 					return date.isSame(event.date, 'day')?event:null;
 				});
@@ -183,8 +199,10 @@
 
 			getDayObject(monthMomentObject, dayIndex){
 				let events= this.getEvents(monthMomentObject)				 
+				// console.log("Month Moment Object",monthMomentObject,"DayIndex",dayIndex);
 				return {
 					isPast: moment(monthMomentObject).add(1,'day') < moment(),
+					isShowable:moment(monthMomentObject).format('M')==this.currentMonth.format('M'),
 					isToday: monthMomentObject.isSame(moment(), 'day'),
 					isCurrentMonth: monthMomentObject.isSame(moment(), 'month'),
 					weekDay: dayIndex,
@@ -206,6 +224,9 @@
 
 </script>
 <style>
+.custom-height{
+	height: 35px;
+}
 .isBigFont p {
     color: #000;
     padding: 0px 0px 0px 0px;

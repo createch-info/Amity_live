@@ -1,6 +1,10 @@
 <template>
-  <div class="week-row" @click="showWeekNumber">
-    <day :issmall="issmall" :dayselect="dayclicked" v-for="(day, index) in week" :day="day" :key="index"></day>
+  <div :style="{'height':customHeight}" class="week-row" @click="showWeekNumber">
+    <day :issmall="issmall" :dayselect="dayclicked" v-for="(day, index) in week" :showable="day.isShowable" :day="day" :key="index">
+      <!-- <template slot="is_curr">
+        <p style="color:red;">{{day.isShowable}}</p>
+      </template> -->
+    </day>
   </div>
 </template>
 <script>
@@ -13,6 +17,9 @@ export default {
       : require("./Day.vue")
   },
   props: {
+    customHeight:{
+      type:String
+    },
     dayclicked:{
         type:Number,
 				default:0,
@@ -46,7 +53,7 @@ export default {
 <style>
 .week-row {
   width: 100%;
-  border-left: 1px solid #e0e0e0;
+  /* border-left: 1px solid #e0e0e0; */
   display: flex;
   /* cursor: pointer; */
 }

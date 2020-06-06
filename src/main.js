@@ -16,14 +16,17 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import '@/assets/custom.css'
 import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 import VuetablePagination from "vuetable-2/src/components/VuetablePagination";
 import * as VueGoogleMaps from 'vue2-google-maps'
 import VeeValidate from 'vee-validate';
+
 // import Vuetify from 'vuetify'
 
 
 Vue.use(ReadMore);
 Vue.use(VeeValidate);
+
 // Vue.use(Vuetify);
 
 Vue.component("vuetable-pagination",VuetablePagination,{

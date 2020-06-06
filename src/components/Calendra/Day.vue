@@ -1,15 +1,40 @@
 <template>
   <div
     class="day-cell"
-    :class="{ 'isBigFont':!issmall, 'isSmallFont':issmall,'minHieght':issmall,'hasEvent':day.hasEvent,'today' : day.isToday, 'current-month' : day.isCurrentMonth, 'weekend': day.isWeekEnd, 'selected-day':isDaySelected,'isPast':day.isPast}"
-    @click="showDayOptions"
+    :class="{ 'isBigFont':!issmall, 'isSmallFont':issmall,'minHieght':issmall,'hasEvent':day.hasEvent,'today' : day.isToday, 'current-month' : day.isCurrentMonth, 'weekend': day.isWeekEnd, 'selected-day':isDaySelected,'isPast':day.isPast,'tooltip-hover':day.hasEvent}"
+    @click="showDayOptions" style="min-height:0px !important;"
   >
-    <div class="row">
-      <div class="col-sm-12">
-        <p class>{{ day.date.format('D') }}</p>
+       <p style="position:relative" :class="{'style-text':day.hasEvent}" v-show="showable">{{ day.date.format('D') }}
+        </p>
+    <!-- <div class="row" >
+      <div class="col-sm-12" :class="{'tooltip-hover':day.hasEvent}" >
+        <p style="position:relative" :class="{'style-text':day.hasEvent}" v-show="showable">{{ day.date.format('D') }}
+          
+          <span v-if="day.hasEvent" class="tooltiptext">
+            {{day.events.length > 0 ? day.events[0].title : ''}}
+            
+            <br/><br/>
+            {{day.events[0].date_}}
+            <br/>
+            {{day.events[0].start_time+" - "+day.events[0].end_time}}
+
+          </span>
+        </p>
       </div>
     </div>
+     -->
+
+     <span v-if="day.hasEvent" class="tooltiptext">
+            <div style="text-decoration:underline">{{day.events.length > 0 ? day.events[0].title : ''}}
+            </div>
+            <br/>
+            {{day.events[0].date_}}
+            <br/>
+            {{day.events[0].start_time+" - "+day.events[0].end_time}}
+
+          </span>
     <div v-if="!issmall" class="event-box">
+     
       <event-card
         :event="event"
         :key="event.id"
@@ -19,9 +44,13 @@
         v-for="event in day.events"
       ></event-card>
     </div>
+
+    <!-- <slot name="is_curr"></slot> -->
   </div>
 </template>
+
 <script>
+
 import moment from "moment";
 import { DAY_SELECTED, CHANGE_MONTH } from "./actions";
 export default {
@@ -36,9 +65,15 @@ export default {
       : require("./EventCard.vue")
   },
   props: {
+    customHeight:{
+      type:String
+    },
     dayselect:{
       type:Number,
 				default:0,
+    },
+    showable:{
+      type: Boolean,
     },
     issmall: {
       type: Boolean,
@@ -73,6 +108,9 @@ export default {
   },
   
   methods: {
+    formatdate(date){
+        return date;
+    },
     showDayOptions() {
       console.log('showDayOptions')
       let me = this;
@@ -90,10 +128,78 @@ export default {
   }
 };
 </script>
-<style>
-@media(min-width:769px)  {
-  
+<style scoped>
+.style-text{
+  text-decoration: underline;
+  color: black !important;
+}
 
+.tooltip-hover {
+  position: relative;
+  margin: 0%;
+  top:0px;
+  display: inline-block;
+
+}
+
+.tooltip-hover .tooltiptext{
+    visibility: hidden;
+    width: 250px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 103%;
+    left: 50%;
+    margin-left: -122px;
+    opacity: 0;
+    /* -webkit-transition: opacity .3s; */
+    transition: opacity .3s;
+}
+/* .tooltip-hover .tooltiptext
+{
+    visibility: hidden;
+    width: 250px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    -webkit-transition: opacity .3s;
+    transition: opacity .3s;
+  
+    } */
+.tooltip-hover .tooltiptext::after {
+  /* content: ""; */
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  /* border-color: #555 transparent transparent transparent; */
+}
+
+.tooltip-hover:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+  
+}
+
+
+
+@media(min-width:769px)  {
 .minHieght {
   min-height: 50px !important;
 }
@@ -120,14 +226,19 @@ export default {
 .hasEvent.isPast.day-number {
   color: rgba(0, 0, 0, 0.5) !important;
 }
+
+/* .day-cell:hover{
+  background-color: #000000;
+} */
+
 .day-cell {
   flex: 1;
-  min-height: 112px;
-  padding: 4px;
-  border-right: 1px solid #e0e0e0;
-  border-bottom: 1px solid #e0e0e0;
-  background: rgba(147, 147, 147, 0.1);
-  border-left: solid 5px transparent;
+  min-height: 110px;
+  /* padding: 4px; */
+  /* border-right: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0; */
+  /* background: rgba(147, 147, 147, 0.1); */
+  /* border-left: solid 5px transparent; */
 }
 
 .day-number {
@@ -139,7 +250,7 @@ export default {
 }
 
 .current-month {
-  background: #fff;
+  background: #f4f4f4;
 }
 
 .selected-day.hasEven p {
@@ -180,7 +291,7 @@ export default {
 } */
 .isSmallFont p {
   color: #000;
-  font-size: 16px !important;
+  font-size: 11px !important;
   text-align: center;
   padding: 5px 0px;
 }
@@ -240,7 +351,7 @@ export default {
 .day-cell {
   flex: 1;
   min-height: 52px;
-  padding: 4px;
+  padding: inherit;
   border-right: 1px solid #e0e0e0;
   border-bottom: 1px solid #e0e0e0;
   background: rgba(147, 147, 147, 0.1);
@@ -257,7 +368,7 @@ export default {
 }
 
 .current-month {
-  background: #fff;
+  background: #f4f4f4;;
 }
 
 .selected-day.hasEven p {

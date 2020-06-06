@@ -15,7 +15,7 @@ const router = new Router({
   routes: [
     {
       path:'/swapper',
-      name:'swapper',
+      name:'swapper', 
       component:swapper,  
       meta:{
         guest: true,
@@ -28,7 +28,7 @@ const router = new Router({
       component: Home,
       meta:{
         guest: true,
-        title:'SEMINAR REGISTRATION'
+        title:'EDUCATION EVENTS CALENDAR'
       }
     },
     {
@@ -46,7 +46,7 @@ const router = new Router({
       component:()=>import('./views/Booking.vue'),
       meta:{
         guest: true,
-        title:'SEMINAR REGISTRATION'
+        title:'EDUCATION EVENT REGISTRATION'
       }
     },
     {

@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <Header/>
+    <!-- <p class="red">askdj</p> -->
     <b-container class="main" fluid>
          <router-view :key="$route.fullPath"/>
     </b-container>
@@ -8,8 +9,9 @@
   </div>
 </template>
 <script>
-import Header from '@/components/Header'
-import Footer from '@/components/Footer'
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+
 export default {
   components:{
     Header,
@@ -21,6 +23,19 @@ export default {
 <style>
 @import '~bootstrap/dist/css/bootstrap.css';
 @import '~bootstrap-vue/dist/bootstrap-vue.css';
+
+.navbar-dark .navbar-nav .nav-link
+{
+  color: black !important;
+  font-weight: bold;
+}
+.navbar-dark .navbar-nav .nav-link:hover, .navbar-dark .navbar-nav .nav-link:focus {
+    color: #003f8c !important;
+    font-weight: bold;
+    border: 2px solid #003f8c;
+        border-radius: 20px;
+}
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

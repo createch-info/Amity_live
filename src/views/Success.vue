@@ -1,9 +1,9 @@
 <template>
   <b-container>
     <div class="show_div">
-    <div class="successDiv">You have successfully registered for Seminar "{{f_title}}"</div>
+    <div class="successDiv">You have successfully registered for event "{{f_title}}"</div>
     
-   <b> <span>
+   <b> <span> 
       Confirmation will be emailed to :
     </span>
     <span>
@@ -15,7 +15,7 @@
      For any questions or cancellation requests, please contact Amity's administrator at: 303-690-2749 or eg@amityhealthcaregroup.com
     </span>
     <br>
-    <b-button @click="$router.push({ path: '/' })" variant="success">BACK TO SEMINARS</b-button> 
+    <b-button @click="$router.push({ path: '/' })" variant="success">Back to Registration Page</b-button> 
     </div>
   </b-container>
 </template>

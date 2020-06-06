@@ -1,6 +1,6 @@
 <template>
   <b-container fluid>
-    <Calendar :loading="loading" :first-day="1" :all-events="events" :showWeekNumberFlag="true"></Calendar>
+    <Calendar  :loading="loading" :first-day="1" :all-events="events" :showWeekNumberFlag="true"></Calendar>
   </b-container>
 </template>
 <script>

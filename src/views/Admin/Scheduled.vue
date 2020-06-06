@@ -1,6 +1,17 @@
 <template>
   <div>
-    <v-row>
+    <b-row>
+        <b-col style="margin-bottom:20px;" lg="3" sm="6">
+          <span style="background-color:#A9A9A9; padding:10px;">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp; <b>Expired Sessions</b>
+        </b-col>
+        <b-col sm="6" style="text-align:left">
+          <span style="background-color:#007bff; padding:10px;">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp; <b>Upcomming Sessions</b>
+        </b-col>
+        <br/><br/>
+        <a href="#content" id="top"></a>
+        
+    </b-row>
+    <!-- <b-row>
         <v-col>
           <span style="background-color:#A9A9A9; padding:10px;">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp; <b>Expired Sessions</b>
           &nbsp;&nbsp;
@@ -8,10 +19,10 @@
         </v-col>
         <br/><br/>
         <a href="#content" id="top"></a>
-    </v-row>
+    </b-row> -->
     <b-row>
       <b-col>
-        <Calendar :loading="loading" :first-day="1" :current-date="currentSeminar._correct_date" :all-events="events" :showWeekNumberFlag="true"></Calendar>
+        <Calendar :monthchanger="true" customheight="130px" :loading="loading" :first-day="1" :current-date="currentSeminar._correct_date" :all-events="events" :showWeekNumberFlag="true"></Calendar>
       </b-col>
     </b-row>
     <span id="content"></span>
@@ -32,7 +43,7 @@
             <label for="textarea-default" style="font-weight:bold;">Description:</label>
           </b-col>
           <b-col sm="10">
-            <read-more more-str="read more" :text="currentSeminar.description" link="#" less-str="read less" :max-chars="250"></read-more>
+            <read-more more-str="read more" :text="currentSeminar.formated_description" link="#" less-str="read less" :max-chars="250000"></read-more>
             <!-- <b-form-textarea
               id="textarea-default"
               v-model="currentSeminar.description"
@@ -64,13 +75,28 @@
             <b-form-input disabled v-model="currentSeminar.registrants_count"></b-form-input>
           </b-col>
         </b-row>
-
-        <b-row class="mt-2">
+        <b-row v-if="!isSeminar">
+            <b-col md="2" sm="2">
+              <label for="textarea-default" style="font-weight:bold;">Webinar Details:</label>
+            </b-col>
+            <b-col md="10" sm="12">
+              <read-more more-str="read more" :text="currentSeminar.webinarDetails" link="#" less-str="read less" :max-chars="250000"></read-more>
+              <!-- <b-form-textarea disabled rows="3" v-model="currentSeminar.venue_address"></b-form-textarea> -->
+            </b-col>
+            <b-col sm="2">
+            </b-col>
+            <b-col md="10" sm="12">
+              <a :href="currentSeminar.url">{{currentSeminar.url}}</a>
+              <!-- <b-form-textarea disabled rows="3" v-model="currentSeminar.venue_address"></b-form-textarea> -->
+            </b-col>
+        </b-row>
+      
+        <b-row class="mt-2" v-if="isSeminar">
           <b-col sm="2">
             <label for="textarea-default" style="font-weight:bold;">Venue Address:</label>
           </b-col>
           <b-col md="4" sm="12">
-            <read-more more-str="read more" :text="currentSeminar.venue_address" link="#" less-str="read less" :max-chars="250"></read-more>
+            <read-more more-str="read more" :text="currentSeminar.venue_address" link="#" less-str="read less" :max-chars="250000"></read-more>
             <!-- <b-form-textarea disabled rows="3" v-model="currentSeminar.venue_address"></b-form-textarea> -->
           </b-col>
           <b-col md="4" sm="12">
@@ -135,7 +161,7 @@
               :key="index"
               size="sm"
               class="mt-3"
-             disabled
+              disabled
               v-model="currentSeminar.schedules[index]"
        :options="[
        {value:1,text:'1 Month Before'},
@@ -151,6 +177,28 @@
 
       </b-col>
       <b-col md="9" sm="12" xl="9" style="font-weight:bold;" v-else>
+         <b-row>
+            <b-col md="3">
+                <b-form-group label="Seminar Type">
+                </b-form-group>
+            </b-col>
+          
+            <b-col md="3">
+                <b-form-radio v-model="currentSeminar.type" 
+                  value="seminar"
+                  >Seminar
+                </b-form-radio>        
+            </b-col>
+
+            <b-col md="3">
+                <b-form-radio 
+                  v-model="currentSeminar.type" 
+                  value="webinar">Webinar
+                </b-form-radio>    
+            </b-col>
+          
+        </b-row>
+
         <b-form @submit="onSubmit">
           <b-form-group
             id="input-group-1"
@@ -207,6 +255,7 @@
                     minDate: new Date()
                         }"
               ></date-picker>
+              <br/>
             </b-col>
 
             <b-col>
@@ -219,7 +268,7 @@
                 :invalid-feedback="error.start_time ? error.start_time[0] : '' "
               >
                 <b-form-input
-                disabled
+                
                   :state="error.start_time ? false : true"
                   type="time"
                   id="input-2"
@@ -241,7 +290,7 @@
               >
           
                 <b-form-input
-                disabled
+                
                   :state="error.end_time_sc ? false : true"
                   type="time"
                   id="input-2"  
@@ -252,7 +301,7 @@
               </b-form-group>
             </b-col>
           </b-row>
-          <b-row>
+          <b-row v-if="isSeminar">
             <b-col md="6" sm="6" lg="6">
               <b-form-group
                 label-cols-sm="12"
@@ -303,6 +352,43 @@
             </b-col>
           </b-row>
 
+          <b-row  v-if="!isSeminar">
+            <b-col md="12">
+               <b-form-group
+                label-cols-sm="12"
+                label-cols-lg="3"
+                id="input-group-2"
+                label="Webinar Details:"
+                label-for="input-2"
+                :invalid-feedback="error.description ? error.description[0] : '' "
+              >
+              <vue-editor :editor-toolbar="customToolbar"   v-model="currentSeminar.webinarDetails"></vue-editor>
+               </b-form-group>
+            </b-col>
+
+            <b-col>
+               <b-form-group
+                label-cols-sm="12"
+                label-cols-lg="3"
+                id="input-group-2"
+                label="Call to action (Zoom Link):"
+                label-for="input-2"
+                :invalid-feedback="error.url ? error.url[0] : '' "
+              >
+              
+               <b-form-input
+                  id="input-1"
+                  v-model="currentSeminar.url"
+                  :state="error.url ? false : true"
+                  required
+                  placeholder="Call to action (Zoom Link)"
+                ></b-form-input>
+
+               </b-form-group>
+            </b-col>
+            
+          </b-row>
+
           <b-form-group
             label-cols-sm="12"
             label-cols-lg="3"
@@ -311,14 +397,16 @@
             label-for="input-2"
             :invalid-feedback="error.description ? error.description[0] : '' "
           >
-            <b-form-textarea
-              :state="error.description ? false : true"
+
+           <vue-editor :editor-toolbar="customToolbar"   v-model="currentSeminar.formated_description"></vue-editor>
+            <!-- <b-form-textarea
+              :state="error.description ? false : true"`
               id="textarea"
               v-model="currentSeminar.formated_description"
               placeholder="Enter description..."
               rows="10"
               max-rows="6"
-            ></b-form-textarea>
+            ></b-form-textarea> -->
           </b-form-group>
           <b-form-group
             :invalid-feedback="error.cost_per_seat ? error.cost_per_seat[0] : '' "
@@ -328,7 +416,7 @@
             label="Cost Per Seat:"
             label-for="input-2"
           >
-          <b-form-input  :state="error.FormatedCost ? false : true" disabled v-model="currentSeminar.FormatedCost"></b-form-input>
+          <b-form-input  :state="error.FormatedCost ? false : true"  v-model="currentSeminar.cost_per_seat"></b-form-input>
             <!-- <b-form-input
             disabled
               :state="error.FormatedCost ? false : true"
@@ -459,21 +547,28 @@ import VuetableFieldCheckbox from "vuetable-2/src/components/VuetableFieldCheckb
 import VuetableFieldSequence from "vuetable-2/src/components/VuetableFieldSequence.vue";
 import { gmapApi } from "vue2-google-maps";
 import EventBus from './../../eventBus'
+import { VueEditor } from "vue2-editor";
 
 export default {
   components: {
     Calendar,
     Vuetable,
     Loadder,
-    datePicker
+    datePicker,
+    VueEditor
   },
   data() {
     return {
+       customToolbar: [
+      ["bold", "italic", "underline"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      // ["image", "code-block"]
+      ],
       loading: false,
       events: [],
       isProcess: false,
       currentCroods: {},
-      changeddate:'date', 
+      changeddate:'date',
       day:1,
       columns: [
         {
@@ -631,6 +726,7 @@ export default {
           this.currentSeminar.venue_address=this.currentSeminar.formated_venue_address;
 
           this.isProcess = true;
+          // console.log(this.currentSeminar);
           this.$http
             .put(`seminar/${this.currentSeminar.id}`, this.currentSeminar)
             .then(res => {
@@ -721,6 +817,10 @@ export default {
     }
   },
   computed: {
+    isSeminar()
+    {
+      return (this.currentSeminar.type=="seminar")?true:false
+    },
     google: gmapApi,
     formatedSeminarDate() {
       return this.currentSeminar.seminar_date

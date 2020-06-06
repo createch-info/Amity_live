@@ -1,5 +1,29 @@
 <template>
   <b-form style="font-weight:bold;">
+      <b-row>
+        <b-col md="3">
+            <b-form-group label="Seminar Type">
+            </b-form-group>
+        </b-col>
+      
+        <b-col md="3">
+            <b-form-radio v-model="form.type" 
+              value="seminar"
+              @change="isWebinar"
+              >Seminar
+            </b-form-radio>        
+        </b-col>
+
+        <b-col md="3">
+            <b-form-radio 
+              v-model="form.type" 
+              @change="isWebinar"
+              value="webinar">Webinar
+            </b-form-radio>    
+        </b-col>
+      
+    </b-row>
+
     <b-form-group
       id="input-group-1"
       label-cols-sm="12"
@@ -8,6 +32,7 @@
       label-for="input-horizontal"
       :invalid-feedback="errors.first('title')"
     >
+
       <b-form-input
         id="input-1"
         v-model="form.title"
@@ -37,6 +62,7 @@
         placeholder="Enter Capacity"
       ></b-form-input>
     </b-form-group>
+
     <b-row>
       <b-col md="6">
         <b-form-group
@@ -110,7 +136,69 @@
         </b-form-group>
       </b-col>
     </b-row>
-    <b-row>
+
+   <b-row v-if="isWebinarType">
+      <b-col md="3">
+        <b-form-group
+          label-cols-sm="6"
+          label-cols-lg="6"
+          label-cols-md="6"
+          id="input-group-2"
+          label="Webinar Details:"
+          label-for="input-2"
+        >
+         <!-- :invalid-feedback="errors.first('venue_address')" -->
+        </b-form-group>
+      </b-col>
+      <b-col md="9">
+        <!-- :state="errors.first('description') ? false : true" -->
+          <vue-editor :state="errors.first('webinarDetails') ? false : true" name="webinarDetails" id="textarea" v-model="form.webinarDetails" placeholder="Enter Webinar Details..."  v-validate="'required'" :editor-toolbar="customToolbar"></vue-editor>
+        <br/>
+      </b-col>
+
+       <b-col md="12">
+        <b-form-group
+          label-cols-sm="3"
+          label-cols-lg="3"
+          label-cols-md="3"
+          id="input-group-8"
+          label="Call to action (Zoom Link):"
+          label-for="input-2"
+          :invalid-feedback="errors.first('url')"
+        >
+         <b-form-input
+         :state="errors.first('url') ? false : true"
+          id="input-url"
+          v-validate="'required|isUrl'"
+          v-model="form.url"
+          name="url"
+          placeholder="Call To Action (Zoom Link)"
+        ></b-form-input>
+        </b-form-group>
+      </b-col>
+
+ <!-- <b-form-group
+      label-cols-sm="12"
+      label-cols-lg="3"
+      id="input-group-2"
+      label="Capacity:"
+      label-for="input-2"
+      :invalid-feedback="errors.first('capacity')"
+    >
+      <b-form-input
+        :state="errors.first('capacity') ? false : true"
+        v-validate="'required'"
+        type="number"
+        name="capacity"
+        min="1"
+        id="input-2"
+        v-model="form.capacity"
+        placeholder="Enter Capacity"
+      ></b-form-input>
+    </b-form-group> -->
+    </b-row>
+
+    <b-row v-if="!isWebinarType">
       <b-col md="6">
         <b-form-group
           label-cols-sm="6"
@@ -141,14 +229,14 @@
           map-type-id="terrain"
           style="width: 500px; height: 200px"
           :options="{
-   zoomControl: true,
-   mapTypeControl: false,
-   scaleControl: false,
-   streetViewControl: false,
-   rotateControl: false,
-   fullscreenControl: true,
-   disableDefaultUi: false
- }"
+            zoomControl: true,
+            mapTypeControl: false,
+            scaleControl: false,
+            streetViewControl: false,
+            rotateControl: false,
+            fullscreenControl: true,
+            disableDefaultUi: false
+          }"
         >
           <gmap-marker
             @dragend="setLocation"
@@ -160,6 +248,7 @@
           ></gmap-marker>
           <gmap-info-window v-if="currentCroods" :position="currentCroods"></gmap-info-window>
         </GmapMap>
+        <span v-if='enablelocation' style="color:red;margin-top:10px;font-size:12px">Location access disabled.Please allow location access to load Google Map</span>
       </b-col>
     </b-row>
     <b-form-group
@@ -171,7 +260,10 @@
 
       :invalid-feedback="errors.first('description')"
     >
-      <b-form-textarea
+    
+      <vue-editor :state="errors.first('description') ? false : true" name="description" id="textarea" v-model="form.description" placeholder="Enter description..."  v-validate="'required'" :editor-toolbar="customToolbar"></vue-editor>
+
+      <!-- <b-form-textarea
         :state="errors.first('description') ? false : true"
         id="textarea"
         v-model="form.description"
@@ -180,7 +272,7 @@
         v-validate="'required'"
         name="description"
         max-rows="6"
-      ></b-form-textarea>
+      ></b-form-textarea> -->
     </b-form-group>
     <b-form-group
       :invalid-feedback="errors.first('cost_per_seat')"
@@ -257,9 +349,25 @@ import "pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css";
 import { gmapApi } from "vue2-google-maps";
 import Loadder from "@/components/Loadder";
 import { Validator } from "vee-validate";
+import { VueEditor } from "vue2-editor";
 
 Validator.extend('isBigger', (value, [otherValue]) => {
   return value >= otherValue;
+}, {
+  hasTarget: true
+});
+
+
+Validator.extend('isUrl', (string) => {
+ 
+    var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+    
+    return !!pattern.test(string);
 }, {
   hasTarget: true
 });
@@ -296,6 +404,10 @@ const dict = {
     reminder_numbers: {
       required: "No. of reminders is required"
     },
+    url: {
+      required: "URL is required",
+      isUrl:'Enter a valid url including https://'
+    },
   }
 };
 
@@ -304,6 +416,13 @@ Validator.localize("en", dict);
 export default {
   data() {
     return {
+      isWebinarType:false,
+      enablelocation:false,
+      customToolbar: [
+      ["bold", "italic", "underline"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      // ["image", "code-block"]
+      ],
       isProcess: false,
       currentCroods: {},
       date: new Date(),
@@ -320,13 +439,15 @@ export default {
         capacity: 50,
         seminar_date: new Date(),
         description: null,
-        schedules: []
+        schedules: [],
+        type:'seminar',
       }
     };
   },
   components: {
     Loadder,
-    datePicker
+    datePicker,
+    VueEditor
   },
   mounted() {
     let _this = this;
@@ -344,9 +465,12 @@ export default {
               lng: parseFloat(position.coords.longitude)
             });
           });
+
+          _this.enablelocation=false;
         },
         function(error) {
           alert(error.message);
+          _this.enablelocation=true;
         },
         {
           enableHighAccuracy: true,
@@ -361,6 +485,17 @@ export default {
     google: gmapApi
   },
   methods: {
+    isWebinar(e){
+      
+      if(e=='webinar')
+      {
+          this.isWebinarType=true;
+      }
+      else
+      {
+          this.isWebinarType=false;
+      }
+    },
     setLocation(ev) {
       let geocoder = new this.google.maps.Geocoder();
       let locations = {
@@ -373,7 +508,8 @@ export default {
       let _this = this
 
       this.$validator.validate().then(valid => {
-        if (valid) {
+        if (valid && !_this.enablelocation) 
+        {
           if(this.form.reminder_numbers && this.form.reminder_numbers != (this.form.schedules.length - 1)) 
           return  this.$swal({allowOutsideClick: false,
                 title: 'please select all reminders schedules',
@@ -388,6 +524,8 @@ export default {
           this.isProcess = true;
           this.form.lat = this.currentCroods.lat;
           this.form.lng = this.currentCroods.lng;
+         
+        //  console.log("Form Details",this.form);
           this.$http
             .post("seminar", this.form)
             .then(res => {
@@ -424,6 +562,7 @@ export default {
             .catch(error => {
               this.isProcess = false;
               this.error = error.errors;
+              console.log(error)
             });
         } else {
           this.$swal({allowOutsideClick: false,

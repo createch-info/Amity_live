@@ -1,15 +1,13 @@
 <template>
   <div class="row">
-    <div class="col-sm-4">
-      <button @click.stop="goPrev" class="btn btn-outline btn-primary" style="font-size:14px;">
+    <div v-if="monthchanger" class="col-sm-4">
+      <button @click.stop="goPrev" class="btn btn-outline btn-primary" style="font-size:14px;width:100%">
         <i class="fa fa-backward" aria-hidden="true"></i>
         Previous
       </button>
-      <!-- <div class="form-group">
-               
-      </div>-->
     </div>
-    <div class="col-sm-4 header-center">
+
+    <div class="header-center" :class="{'col-md-12':monthchanger,'col-md-12':!monthchanger}">
       <div class="title">{{title}}</div>
 
       <!-- <div class="btn-group"> -->
@@ -18,12 +16,14 @@
 
       <!-- </div> -->
     </div>
-    <div class="col-sm-4">
-      <button style="float: right; font-size:14px;" @click.stop="goNext" class="btn btn-outline btn-primary" >
+    
+    <div v-if="monthchanger" class="col-sm-4">
+      <button style="float: right; font-size:14px;width:100%" @click.stop="goNext" class="btn btn-outline btn-primary" >
         Next
         <i class="fa fa-forward" aria-hidden="true"></i>
       </button>
     </div>
+
   </div>
 </template>
 <script>
@@ -37,6 +37,10 @@ export default {
     };
   },
   props: {
+    monthchanger:{
+      type:Boolean,
+      default:false
+    },
     currentMonth: {},
     locale: {
       type: String
@@ -82,7 +86,8 @@ export default {
 }
 .title {
   text-align: center;
-  font-size: 1.5em;
+  padding:10px;
+  font-size: 1.2em;
   font-weight: bolder;
 }
 .language-select {

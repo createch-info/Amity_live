@@ -1,7 +1,81 @@
 <template>
   <div class="rootdiv">
     <div>
-      <b-navbar toggleable="lg" type="dark" variant>
+      <b-navbar toggleable="lg" type="dark">
+        <b-navbar-brand :href="href">
+          <b-img-lazy
+            class="logo"
+            src="https://amityhealthcaregroup.com/wp-content/uploads/2019/03/amity-logo-1.png"
+          ></b-img-lazy>
+        </b-navbar-brand>
+
+        <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+
+        <b-collapse id="nav-collapse" is-nav>
+          <div v-if="isAdmin" class="resalign">
+            <b-navbar-nav class="testing_main" is-nav v-if="isAdmin">
+              <b-nav-item
+                :active="$route.name === 'seminarCreate'"
+                class="navlink"
+                href="/education/#/admin/seminar/create"
+              >Create Seminar</b-nav-item>
+              <b-nav-item
+                :active="$route.name === 'seminarRegister'"
+                href="/education/#/admin/seminar/register"
+                class="navlink"
+              >Register</b-nav-item>
+              <b-nav-item
+                :active="($route.name === 'seminarscheduled') || ($route.name === 'dashbord')"
+                href="/education/#/admin/seminar/scheduled"
+                class="navlink"
+              >Scheduled Seminars</b-nav-item>
+              <b-nav-item @click.stop="logout" href="#" class="navlink">LogOut</b-nav-item>
+            </b-navbar-nav>
+          </div>
+          <div v-else class="resalign">
+            <b-navbar-nav>
+              <b-nav-item
+                :active="false"
+                class="navlink"
+                href="https://amityhealthcaregroup.com"
+              >HOME</b-nav-item>
+              <b-nav-item href="https://amityhealthcaregroup.com/about-us/" class="navlink">ABOUT US</b-nav-item>
+              <!-- <b-nav-item href="/#/" class="navlink">SERVICES</b-nav-item> -->
+            </b-navbar-nav>
+            <b-navbar-nav>
+            
+              <b-nav-item-dropdown class="service_nav" >
+                 <template slot="button-content"><b-badge variant="light"><img class="iconNEW" src="https://amityhealthcaregroup.com/wp-content/uploads/new-icon.png"/></b-badge> SERVICES</template>
+                <b-dropdown-item
+                  href="https://amityhealthcaregroup.com/consulting-services/"
+                >Consulting Services</b-dropdown-item>
+                <b-dropdown-item
+                  href="https://amityhealthcaregroup.com/outsourcing-services/"
+                >Outsourcing Services</b-dropdown-item>
+                <b-dropdown-item
+                  href="https://amityhealthcaregroup.com/services/cna-hha-competency/"
+                ><b-badge variant="light"><img class="iconNEW" src="https://amityhealthcaregroup.com/wp-content/uploads/new-icon.png"/></b-badge> CNA / HHA Competency</b-dropdown-item>
+              </b-nav-item-dropdown>
+            </b-navbar-nav>
+            <b-navbar-nav>
+              <b-nav-item
+                :active="true"
+                href="https://amityhealthcaregroup.com/education/#/"
+                class="navlink"
+              >EDUCATION</b-nav-item>
+              <b-nav-item
+                href="https://amityhealthcaregroup.com/resources/"
+                class="navlink"
+              >RESOURCES</b-nav-item>
+              <b-nav-item
+                href="https://amityhealthcaregroup.com/contact/"
+                class="navlink"
+              >CONTACT US</b-nav-item>
+            </b-navbar-nav>
+          </div>
+        </b-collapse>
+      </b-navbar>
+      <!-- <b-navbar toggleable="lg" type="dark" variant>
         <b-navbar-brand :href="href">
           <b-img-lazy
             class="logo"
@@ -25,21 +99,21 @@
             <b-nav-item :active="false" class="navlink" href="https://amityhealthcaregroup.com" >HOME</b-nav-item>
             <b-nav-item href="https://amityhealthcaregroup.com/about-us/" class="navlink">ABOUT US</b-nav-item>
             <b-nav-item href="/#/" class="navlink">SERVICES</b-nav-item>
+
             <b-nav-item :active="true" href="https://amityhealthcaregroup.com/education/#/" class="navlink">EDUCATION</b-nav-item>
             <b-nav-item href="https://amityhealthcaregroup.com/resources/" class="navlink">RESOURCES</b-nav-item>
             <b-nav-item href="https://amityhealthcaregroup.com/contact/" class="navlink">CONTACT US</b-nav-item>
-            <!-- <b-nav-item href="/#/" class="navlink buttonspecial">SUBMIT YOUR INQUIRY</b-nav-item> -->
           </b-navbar-nav>
         </b-collapse>
-      </b-navbar>
-    </div>
+      </b-navbar>-->
+    </div> 
     <div class="page_header">{{$route.meta.title}}</div>
   </div>
 </template>
 
 <script>
 import Extra from "./../extra";
-import EventBus from './../eventBus'
+import EventBus from "./../eventBus";
 export default {
   data() {
     return {
@@ -52,16 +126,16 @@ export default {
     }
   },
 
-created(){
-    this.$root.$on("ADMIN_LOGIN",this.loginAdmin);
-},
+  created() {
+    this.$root.$on("ADMIN_LOGIN", this.loginAdmin);
+  },
 
   watch: {
     $route: function(ob) {}
   },
   methods: {
-    loginAdmin(){
-        this.isAdmin=true
+    loginAdmin() {
+      this.isAdmin = true;
     },
     logout() {
       Extra.logout().then(res => {
@@ -76,13 +150,27 @@ created(){
 </script>
 
 <style scoped>
+.badge {
+  width: 21px;
+}
+.iconNEW{
+    background-position: left;
+    color: transparent;
+    position: relative;
+    right: 25px;
+     height: 17px;
+    vertical-align: text-bottom;
+}
 .page_header {
+  font-family: "Rubik",sans-serif!important;
   justify-content: center;
   align-items: center;
   display: flex;
+  padding-bottom: 40px;
+  padding-top: 40px;
   color: white;
   font-weight: 500;
-  font-size: 23px;
+  font-size: 40px;
   width: 100%;
   height: 50px;
   background-color: #003f8c;
@@ -178,9 +266,19 @@ button.navbar-toggler {
   float: right !important;
 }
 .navbar-expand-lg .navbar-nav {
-  display: inline !important;
+  /* display: inline !important; */
 }
+
+nav.navbar.navbar-dark.navbar-expand-lg {
+    padding: 20px;
+}
+
 @media (min-width: 769px) {
+ 
+  .resalign {
+    display: inherit;
+  }
+
   a.nav-link {
     width: auto !important;
     float: left !important;
@@ -188,6 +286,16 @@ button.navbar-toggler {
   }
 }
 @media (max-width: 768px) {
+   .page_header
+  {
+    padding-bottom: 0px;
+    padding-top: 0px;
+    font-size: 18px;
+  }
+  .resalign{
+    /* display: inline-flex; */
+  }
+
   a.nav-link {
     width: 100% !important;
   }
