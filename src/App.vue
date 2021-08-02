@@ -70,4 +70,5 @@ export default {
   margin-left: 0;
   border-width: .2rem;
 }
+
 </style>

@@ -58,7 +58,7 @@ Loadder
 
                 })
             }).catch(error=>{
-this.isProcess=false
+          this.isProcess=false
             })
         }
     }
@@ -78,6 +78,12 @@ this.isProcess=false
     margin: 0px auto;
 }  
 }
+
+/* .container-fluid {
+  width: 90% !important;
+	margin: auto !important;
+  padding: 0px !important;
+} */
 
 </style>
 

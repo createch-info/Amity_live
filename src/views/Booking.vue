@@ -1,5 +1,5 @@
 <template>
-  <b-container>
+  <b-container class="container-fluid1">
     <b-row v-if="isProcess">
       <b-col>
       </b-col>
@@ -1178,5 +1178,11 @@ button.btn.rotatebtn.btn-primary {
             white-space: -o-pre-wrap;
             word-wrap: break-word;
          }
+
+/* .container-fluid {
+    width: 90% !important;
+	margin: auto !important;
+  padding: 0px !important;
+} */
 
 </style>

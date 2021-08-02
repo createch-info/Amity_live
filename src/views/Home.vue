@@ -1,7 +1,7 @@
 <template>
   <b-container fluid>
-    <b-row>
-        <b-col md="12" sm="12" class="ele1" style="padding:10px;color:red;font-weight:bold;background-color:#dadada"><i>
+    <b-row style="margin:auto;">
+        <b-col md="12" sm="12" class="ele1" style="margin-left:auto !important;	margin-right: auto !important;	color: #721c24 !important;	background-color: #f8d7da !important;	border-color: #f5c6cb !important;	border: 1px solid !important;	border-radius: .25rem !important;	position: center !important;	padding: 12px !important;"><i>
               Due to extenuating circumstances related to COVID-19 and the health and well- being of patients and staff being a primary focus, our regular seminar schedule has been postponed.
 We will be transitioning our education events to webinar format  until further notice and will be offering additional webinars on high priority topics.  To stay up-to-date, please subscribe to our Listserv on our home page.
 We apologize for the inconvenience!</i>
@@ -138,6 +138,10 @@ export default {
   width: auto;
 }
 
+.container-fluid {
+  padding: 0px !important;  
+}
+
 .responsive-changer {
   /* display: none; */
 }
@@ -165,6 +169,8 @@ export default {
     order: 1;
   }
 }
+
+
 /* 
 .container-fluid, .container-sm, .container-md, .container-lg, .container-xl
 {
